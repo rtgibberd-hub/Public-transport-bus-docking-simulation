@@ -6,62 +6,21 @@ from matplotlib.patches import Rectangle
 from matplotlib.animation import FFMpegWriter
 
 
-#ctrl + / over highlighted section of code to uncomment it
+
 #winget install "FFmpeg (Essentials Build)"
 
-#bus parameters
+#Bus parameters
+#Add in the parameters of the bus you would like to use. Additionally, you can save the animation by uncommenting the ani.save line (2nd last line of code). 
 
 
-#ALEXANDER-DENNIS
-# bus_colour= "#8b0000"
-# bus_width= 2.54
-# bus_length= 10.383
-# front_overhang= 2.823
-# rear_overhang= 2.12
-# title ="Bus manouevre - max overlap - ALEXANDER-DENNIS"
-# file_save_name= "ALEXANDER-DENNIS_bus_entry.mp4"
-# global_path =  {'ALEXANDER-DENNIS_bus_entry.mp4':r'C:\Users\rtgib\OneDrive\Documents\mummy simulation bus project\ALEXANDER-DENNIS_bus_entry.mp4'}
-
-#MAN LIONS CITY 10E
-# bus_colour= "white"
-# bus_width= 2.55
-# bus_length= 10.575
-# front_overhang= 2.775
-# rear_overhang= 3.405
-# title = "Bus manouevre - max overlap - MAN LIONS CITY 10E"
-# file_save_name= "MAN_LIONS_CITY_10E_bus_entry.mp4"
-# global_path =  {'MAN_LIONS_CITY_10E_bus_entry.mp4':r'C:\Users\rtgib\OneDrive\Documents\mummy simulation bus project\MAN_LIONS_CITY_10E_bus_entry.mp4'}
-
-#MAN LIONS CITY 12
-# bus_colour= "#ADD8E6"
-# bus_width= 2.55
-# bus_length= 12.185
-# front_overhang= 2.775
-# rear_overhang= 3.405
-# title = "Bus manouevre - max overlap - MAN LIONS CITY 12"
-# file_save_name= "MAN_LIONS_CITY_12_bus_entry.mp4"
-# global_path =  {'MAN_LIONS_CITY_12_bus_entry.mp4':r'C:\Users\rtgib\OneDrive\Documents\mummy simulation bus project\MAN_LIONS_CITY_12_bus_entry.mp4'}
-
-#MAN LIONS CITY 12E
-bus_colour= "#90EE90"
-bus_width= 2.55
-bus_length= 12.2
-front_overhang= 2.775
-rear_overhang= 3.405
-title = "Bus manouevre - max overlap - MAN LIONS CITY 12E"
-file_save_name= "MAN_LIONS_CITY_12E_bus_entry.mp4"
-global_path =  {'MAN_LIONS_CITY_12E_bus_entry.mp4':r'C:\Users\rtgib\OneDrive\Documents\mummy simulation bus project\MAN_LIONS_CITY_12E_bus_entry.mp4'}
-
-#MAN LIONS CITY 12G
-# bus_colour= "#D3D3D3"
-# bus_width= 2.55
-# bus_length= 12.185
-# front_overhang= 2.775
-# rear_overhang= 3.405
-# title = "Bus manouevre - max overlap - MAN LIONS CITY 12G"
-# file_save_name= "MAN_LIONS_CITY_12G_bus_entry.mp4"
-# global_path =  {'MAN_LIONS_CITY_12G_bus_entry.mp4':r'C:\Users\rtgib\OneDrive\Documents\mummy simulation bus project\MAN_LIONS_CITY_12G_bus_entry.mp4'}
-
+# bus_colour= "insert hex colour code"
+# bus_width= your bus width
+# bus_length= your bus length
+# front_overhang= your bus' front overhang
+# rear_overhang= your bus' rear overhang
+# title ="Bus manouevre - max overlap - insert your bus name here"
+# file_save_name= "insert your bus name here_bus_entry.mp4"
+# global_path =  {'insert your bus name here_bus_entry.mp4':r'C:insert your file path here'}
 
 # Coordinates dictionary
 coords = {
@@ -157,8 +116,6 @@ while flw[1] < 0:
     centre = move(centre, heading_1_rad, (distance_1) / steps)
     bus_poly, flw, blw, fl = compute_bus_geometry(centre, vec_bus)
     frames.append(bus_poly)
-
-#print (f"the distance from the centre to y=0 after stage 1 is:{np.abs(centre[1])}")
 # Stage 2: Weighted rotation from heading_1 to heading_2
 
 
@@ -181,19 +138,6 @@ for rot in rotation_changes_1:
     # Final geometry
     bus_poly, flw, blw, fl = compute_bus_geometry(centre, vec_bus)
     frames.append(bus_poly)
-
-
-
-
-
-#for rot in rotation_changes_1:
-  #  centre = move(centre, np.pi/2, np.abs(flw[1]))
-  #  vec_bus = vector_rotate(vec_bus, rot)
-   # centre = move(centre, heading_2_rad, distance_2 / steps)
-  #  bus_poly, flw, blw = compute_bus_geometry(centre, vec_bus)
-  #  frames.append(bus_poly)
-    
-#print(f"distance between front of bus and end of bus stop is:{np.linalg.norm(np.array(coords['bus_stop']['end_pt']) - (np.array(flw) + front_overhang*dir_vec_2))}")
 
 swept_pts = []
 
@@ -310,4 +254,5 @@ def update(frame):
 ani = FuncAnimation(fig, update, frames=frames, interval=50, blit=True)
 writer = FFMpegWriter(fps=6, metadata=dict(artist='Raphael'), bitrate=1800)
 #ani.save(global_path.get(file_save_name), writer=writer, dpi=150)
+
 plt.show()
