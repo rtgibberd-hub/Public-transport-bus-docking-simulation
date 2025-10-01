@@ -1,6 +1,6 @@
 # Bus Docking Simulation
 
-This Python script simulates the path of a bus performing a docking maneuver near a curb. It models the vehicle's motion using a simplified turning radius and visualizes the trajectory with an animated plot.
+This Python script simulates the path of a bus performing a docking manoeuvre near a curb. It models the vehicle's motion using a simplified turning radius and visualizes the trajectory with an animated plot.
 
 ## Features
 - Simulates a bus turning along a circular arc
