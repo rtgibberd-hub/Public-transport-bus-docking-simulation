@@ -6,21 +6,22 @@ from matplotlib.patches import Rectangle
 from matplotlib.animation import FFMpegWriter
 
 
+# ctrl + / over highlighted section of code to uncomment it
+# winget install "FFmpeg (Essentials Build)"
 
-#winget install "FFmpeg (Essentials Build)"
+#Please remove the '#' when you wish to save your file at the bottom of thsi script. 
 
-#Bus parameters
-#Add in the parameters of the bus you would like to use. Additionally, you can save the animation by uncommenting the ani.save line (2nd last line of code). 
+# bus parameters
 
+# ALEXANDER-DENNIS
+bus_colour = #the hex colour code of your bus
+bus_width = #your bus width
+bus_length = #your bus length
+front_overhang = #the front overhang found on the bus, measured form the front axle
+rear_overhang = #the rear overhang, measured from the rear axle
+file_save_name = #what you are planning to call your file, please remember to use ''
+global_path = #the file path for your file. Please make sure to use {''}
 
-# bus_colour= "insert hex colour code"
-# bus_width= your bus width
-# bus_length= your bus length
-# front_overhang= your bus' front overhang
-# rear_overhang= your bus' rear overhang
-# title ="Bus manouevre - max overlap - insert your bus name here"
-# file_save_name= "insert your bus name here_bus_entry.mp4"
-# global_path =  {'insert your bus name here_bus_entry.mp4':r'C:insert your file path here'}
 
 # Coordinates dictionary
 coords = {
@@ -32,8 +33,7 @@ coords = {
     "guiding_track": {
         "start": [-9.848-4.357447380663206, -4.986],
         "corner_pt": [0.79-4.357447380663206, -3.25],
-        "end_pt": [10, -3.25],
-        "actual_end": [29.406, -8.088]
+        "end_pt": [20-4.357447380663206, -3.25],
     }
 }
 
@@ -57,14 +57,14 @@ dir_vec_1 = np.array([np.cos(heading_1_rad), np.sin(heading_1_rad)])
 dir_vec_2 = np.array([np.cos(heading_2_rad), np.sin(heading_2_rad)])
 dir_vec_3 = np.array([np.cos(heading_3_rad), np.sin(heading_3_rad)])
 
-pt_1 = origin  - dir_vec_1 * (distance_1 )
+pt_1 = origin  - dir_vec_1 * (distance_1)
 pt_2 = origin
 pt_3 = origin + dir_vec_2 * distance_2
 pt_4 = pt_3 + dir_vec_3 * distance_3
 
 
-#turning amounts
-weights = 0.5 * np.cos (np.linspace(0, np.pi, steps)) + 0.5
+# turning amounts
+weights = 0.5 * np.cos(np.linspace(0, np.pi, steps)) + 0.5
 weights /= weights.sum()
 
 rotation_changes_1 = weights * heading_1_rad
@@ -116,9 +116,9 @@ while flw[1] < 0:
     centre = move(centre, heading_1_rad, (distance_1) / steps)
     bus_poly, flw, blw, fl = compute_bus_geometry(centre, vec_bus)
     frames.append(bus_poly)
+
+# print (f"the distance from the centre to y=0 after stage 1 is:{np.abs(centre[1])}")
 # Stage 2: Weighted rotation from heading_1 to heading_2
-
-
 
 pivot_1 = flw.copy()  # This point stays fixed on the curb
 
@@ -129,7 +129,6 @@ for rot in rotation_changes_1:
     pivot_1 = move(flw, heading_2_rad, distance_2/steps)
 
     # Recompute centre so that flw stays at anchor
-    # This assumes compute_bus_geometry returns flw based on centre and vec_bus
     temp_centre = centre.copy()
     temp_bus_poly, temp_flw, _, _ = compute_bus_geometry(temp_centre, vec_bus)
     offset = pivot_1 - temp_flw
@@ -138,6 +137,16 @@ for rot in rotation_changes_1:
     # Final geometry
     bus_poly, flw, blw, fl = compute_bus_geometry(centre, vec_bus)
     frames.append(bus_poly)
+
+
+# for rot in rotation_changes_1:
+  # centre = move(centre, np.pi/2, np.abs(flw[1]))
+  # vec_bus = vector_rotate(vec_bus, rot)
+  # centre = move(centre, heading_2_rad, distance_2 / steps)
+  # bus_poly, flw, blw = compute_bus_geometry(centre, vec_bus)
+  # frames.append(bus_poly)
+    
+# print(f"distance between front of bus and end of bus stop is:{np.linalg.norm(np.array(coords['bus_stop']['end_pt']) - (np.array(flw) + front_overhang*dir_vec_2))}")
 
 swept_pts = []
 
@@ -151,6 +160,7 @@ if swept_pts:
     swept_polygon = np.array(swept_pts + [swept_pts[-1] + [0, 0.1], swept_pts[0] + [0, 0.1]])
 
 print(f"Swept points collected: {len(swept_pts)}")
+
 # Pause after Stage 2
 for _ in range(int(2000 / 50)):
     frames.append(bus_poly.copy())
@@ -163,32 +173,35 @@ for rot in rotation_changes_3:
     frames.append(bus_poly)
 
 
-    
 # Animation setup
 fig, ax = plt.subplots(figsize=(8, 6))
 if swept_pts:
-    swept_patch = Polygon(swept_polygon, closed=True, color='red', alpha=0.4, label='Swept Area', zorder = 5)
+    swept_patch = Polygon(swept_polygon, closed=True, color='red', alpha=0.4, label='Swept Area', zorder=5)
     ax.add_patch(swept_patch)
 ax.legend()
-swept_pts_array = np.array(swept_pts)
-max_dist_into_pavement = np.max(swept_pts_array[:, 1])
-range_of_overlap =np.max(swept_pts_array[:, 0]) - np.min(swept_pts_array[:, 0])
 
-ax.text(x= -20, y= 10, s = f"Max distance into the pavement is:{round(max_dist_into_pavement, 2)}m\nThe range of the overlap is:{range_of_overlap:.2f}", fontsize = 6, color = 'black', bbox = dict(facecolor = 'white', edgecolor = 'black', boxstyle = 'round, pad = 0.3'))
-#width of overlap
+if swept_pts:
+    swept_pts_array = np.array(swept_pts)
+    max_dist_into_pavement = np.max(swept_pts_array[:, 1])
+    range_of_overlap = np.max(swept_pts_array[:, 0]) - np.min(swept_pts_array[:, 0])
+    ax.text(x=-20, y=10, s=f"Max distance into the pavement is:{round(max_dist_into_pavement, 2)}m\nThe range of the overlap is:{range_of_overlap:.2f}", fontsize=6, color='black', bbox=dict(facecolor='white', edgecolor='black', boxstyle='round, pad=0.3'))
+
+# width of overlap
 ax.set_xlim(-20, 30)
 ax.set_ylim(-10, 2)
 ax.set_aspect('equal')
 ax.grid(True)
-ax.set_title(title)
-bus_patch = Polygon(frames[0], closed=True, facecolor=bus_colour, edgecolor='black', zorder = 9)
+ax.set_title("Bus Manoeuvre Animation")
+
+bus_patch = Polygon(frames[0], closed=True, facecolor=bus_colour, edgecolor='black', alpha=0.7)
 ax.add_patch(bus_patch)
+
 # Plot static elements
 bs = coords["bus_stop"]
 gt = coords["guiding_track"]
 ax.plot(*zip(bs["starting_pt"], bs["contact_pt"], bs["end_pt"]), 'k--', label='Bus Stop')
-ax.plot(*zip(gt["start"], gt["corner_pt"], gt["end_pt"], gt["actual_end"]), 'b--', label='Guiding Track')
-ax.axhline(y = -6, color = 'white', linestyle = '--', linewidth = 1.5, zorder = 2)
+ax.plot(*zip(gt["start"], gt["corner_pt"], gt["end_pt"]), 'b--', label='Guiding Track')
+ax.axhline(y=-6, color='white', linestyle='--', linewidth=1.5)
 
 if show_wheel_markers:
     flw_marker, = ax.plot([], [], 'o', color='orange', label='FLW')
@@ -201,7 +214,7 @@ waiting_area = Rectangle(
     2,                  # Height: 2 - 0
     facecolor='black',
     alpha=0.2, 
-    zorder = 1
+    zorder=1
 )
 
 # Add it to the plot
@@ -210,32 +223,31 @@ outer_area_rhs = Rectangle(
     (-20-4.35744738066320, 0), 
     18, 
     2, 
-    facecolor = 'green', 
-    alpha = 0.7,
-    zorder = 1
-
+    facecolor='green', 
+    alpha=0.7,
+    zorder=1
 )
 
 outer_area_lhs = Rectangle(
     (20-4.35744738066320, 0),
     20, 
     2, 
-    facecolor = 'green', 
-    alpha = 0.7,
-    zorder = 1
+    facecolor='green', 
+    alpha=0.7,
+    zorder=1
 )
 
 ax.add_patch(outer_area_rhs)
-ax.add_patch (outer_area_lhs)
+ax.add_patch(outer_area_lhs)
 
 road = Rectangle(
     (-20, -10), 
     50, 
     10,
-    facecolor = 'black',
-    zorder = 1
-
+    facecolor='black',
+    zorder=1
 )
+
 ax.add_patch(road)
 ax.grid(False)
 
@@ -252,7 +264,6 @@ def update(frame):
     return tuple(artists)
 
 ani = FuncAnimation(fig, update, frames=frames, interval=50, blit=True)
-writer = FFMpegWriter(fps=6, metadata=dict(artist='Raphael'), bitrate=1800)
-#ani.save(global_path.get(file_save_name), writer=writer, dpi=150)
-
+writer = FFMpegWriter(fps=6, metadata=dict(artist='Insert Author Name'), bitrate=1800)
+# ani.save(global_path.get(file_save_name), writer=writer, dpi=150)
 plt.show()
